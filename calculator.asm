@@ -1,7 +1,20 @@
 .ORIG x3000
 
 START
-BR START
+    JSR GETNUM
+        ADD R1, R0, #0
+
+        JSR GETOP
+        ADD R2, R0, #0
+
+        JSR GETNUM
+        ADD R3, R0, #0
+
+        JSR CALC
+
+        JSR DISPLAY
+
+        HALT
 
 GETNUM
     ;Get first digit
