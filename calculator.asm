@@ -4,28 +4,28 @@ START
 BR START
 
 GETNUM
-    ; Get first digit
+    ;Get first digit
     GETC
     ADD R1, R0, #0
 
-    ; Turn ASCII into a number
+    ;Turn ASCII into a number
     LD R2, fourtyEight
     ADD R1, R1, R2
 
-    ; Get second digit
+    ;Get second digit
     GETC
 
-    ; Turn ASCII into a number
+    ;Turn ASCII into a number
     ADD R0, R0, R2
 
-    ; Multiply first digit by 10 to take it to tens place
+    ;Multiply first digit by 10 to take it to tens place
     ADD R2, R1, R1
     ADD R2, R2, R2
     ADD R2, R2, R2
     ADD R2, R2, R1
     ADD R2, R2, R1
 
-    ; Add second digit
+    ;Add second digit
     ADD R0, R2, R0
 RET
 
@@ -70,13 +70,96 @@ CALC
     RET
 RET
 
-DISPLAY
+DISPLAY ;basically going to seperate thousands hundreds tens and ones by counting the number of itirations while subtracting 1000 100 10 and 1(dont need to) until the number turns negative
+
+    ;Save the number
+    ADD R1, R0, #0
+
+    ;Check if negative
+    ADD R1, R1, #0
+    BRzp POSITIVE
+
+    ;Print minus sign
+    LD R0, MINUS
+    OUT
+
+    ;Make number positive
+    NOT R1, R1
+    ADD R1, R1, #1
+
+    POSITIVE
+        ;THOUSANDS -----------
+        AND R2, R2, #0
+        LD R3, NEG1000
+
+        LOOP1000
+            ADD R1, R1, R3
+            BRn DONE1000
+
+            ADD R2, R2, #1
+            BR LOOP1000
+
+        DONE1000
+            LD R3, POS1000
+            ADD R1, R1, R3
+
+            LD R3, fourtyEight
+            ADD R0, R2, R3
+            OUT
+
+
+        ;HUNDREDS ----------------
+        AND R2, R2, #0
+        LD R3, NEG100
+
+        LOOP100
+            ADD R1, R1, R3
+            BRn DONE100
+
+            ADD R2, R2, #1
+            BR LOOP100
+
+        DONE100
+            LD R3, POS100
+            ADD R1, R1, R3
+
+            LD R3, fourtyEight
+            ADD R0, R2, R3
+            OUT
+
+
+        ;TENS ------------------
+        AND R2, R2, #0
+        LD R3, NEG10
+
+        LOOP10
+            ADD R1, R1, R3
+            BRn DONE10
+
+            ADD R2, R2, #1
+            BR LOOP10
+
+        DONE10
+            LD R3, POS10
+            ADD R1, R1, R3
+
+            LD R3, fourtyEight
+            ADD R0, R2, R3
+            OUT
+
+
+        ;ONES ---------------------
+
+        LD R3, fourtyEight
+        ADD R0, R1, R3
+        OUT
+
 RET
 
 
 
 
-FOURTYEIGHT
+fourtyEight
     .FILL #-48
 
 PLUS
@@ -85,6 +168,23 @@ PLUS
 MINUS
     .FILL #45
 
+NEG1000
+    .FILL #-1000
+
+POS1000
+    .FILL #1000
+
+NEG100
+    .FILL #-100
+
+POS100
+    .FILL #100
+
+NEG10
+    .FILL #-10
+
+POS10
+    .FILL #10
 
 
 
