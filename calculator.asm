@@ -17,6 +17,11 @@ START
         HALT
 
 GETNUM
+    ;Save registers because GETNUM uses them
+    ST R7, SAVE_R7
+    ST R1, SAVE_R1
+    ST R2, SAVE_R2
+
     ;Get first digit
     GETC
     ADD R1, R0, #0
@@ -31,7 +36,7 @@ GETNUM
     ;Turn ASCII into a number
     ADD R0, R0, R2
 
-    ;Multiply first digit by 10 to take it to tens place
+    ;Multiply first digit by 10
     ADD R2, R1, R1
     ADD R2, R2, R2
     ADD R2, R2, R2
@@ -40,10 +45,20 @@ GETNUM
 
     ;Add second digit
     ADD R0, R2, R0
+
+    ;Restore registers
+    LD R1, SAVE_R1
+    LD R2, SAVE_R2
+    LD R7, SAVE_R7
 RET
 
 GETOP
+    ST R7, SAVE_R7
+
     GETC ;because operation symbols dont need to be converted to text
+
+    LD R7, SAVE_R7
+    RET
 RET
 
 CALC
@@ -85,6 +100,8 @@ RET
 
 DISPLAY ;basically going to seperate thousands hundreds tens and ones by counting the number of itirations while subtracting 1000 100 10 and 1(dont need to) until the number turns negative
 
+    ST R7, SAVE_R7
+
     ;Save the number
     ADD R1, R0, #0
 
@@ -116,7 +133,7 @@ DISPLAY ;basically going to seperate thousands hundreds tens and ones by countin
             LD R3, POS1000
             ADD R1, R1, R3
 
-            LD R3, fourtyEight
+            LD R3, posFortyEight
             ADD R0, R2, R3
             OUT
 
@@ -136,7 +153,7 @@ DISPLAY ;basically going to seperate thousands hundreds tens and ones by countin
             LD R3, POS100
             ADD R1, R1, R3
 
-            LD R3, fourtyEight
+            LD R3, posFortyEight
             ADD R0, R2, R3
             OUT
 
@@ -156,24 +173,35 @@ DISPLAY ;basically going to seperate thousands hundreds tens and ones by countin
             LD R3, POS10
             ADD R1, R1, R3
 
-            LD R3, fourtyEight
+            LD R3, posFortyEight
             ADD R0, R2, R3
             OUT
 
 
         ;ONES ---------------------
 
-        LD R3, fourtyEight
+        LD R3, posFortyEight
         ADD R0, R1, R3
         OUT
 
+    LD R7, SAVE_R7
+
 RET
 
+SAVE_R7
+    .BLKW #1
 
+SAVE_R1
+    .BLKW #1
 
+SAVE_R2
+    .BLKW #1
 
 fourtyEight
     .FILL #-48
+
+posFortyEight
+    .FILL #48
 
 PLUS
     .FILL #43
